@@ -1,0 +1,5 @@
+@import "tailwindcss" prefix(tw);
+
+@source "../**/*.liquid";
+@source "../**/*.json";
+@source "../**/*.js";

@@ -1,0 +1,7 @@
+.gitignore
+node_modules/
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+example.shopify.theme.toml
+assets/tailwind.input.css
