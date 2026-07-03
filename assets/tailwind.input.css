@@ -3,3 +3,51 @@
 @source "../**/*.liquid";
 @source "../**/*.json";
 @source "../**/*.js";
+
+@theme {
+    --color-card-body: #111111;
+    --color-card-brand: #0A4874;
+    --color-card-sale: #FF0000;
+
+    /* Fonts */
+    --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
+    --font-badge: 'Franklin Gothic ATF', Arial, sans-serif;
+}
+
+@utility badge-sale {
+    @apply tw:absolute tw:top-3 tw:left-3 tw:z-10 tw:px-[12px] tw:py-[6px] tw:bg-white tw:text-card-sale tw:border tw:border-card-sale;
+    @apply tw:font-badge tw:text-[15px] tw:font-medium tw:leading-[18px] tw:rounded-full;
+}
+
+@utility add-to-cart-button {
+    @apply tw:mt-3 tw:w-full tw:py-3 tw:capitalize tw:text-white tw:bg-card-brand tw:cursor-pointer tw:transition-all tw:rounded-2xl;
+    @apply tw:hover:bg-card-brand/80 tw:focus:outline-none tw:focus:ring-2 tw:focus:ring-card-brand tw:focus:ring-offset-2;
+}
+
+@utility swatch-radio {
+    @apply tw:relative tw:size-[20px] tw:shrink-0 tw:transition-transform tw:hover:scale-110;
+
+    & input[type="radio"] {
+        @apply tw:absolute tw:inset-0 tw:z-10 tw:m-0 tw:h-full tw:w-full tw:cursor-pointer tw:opacity-0;
+    }
+
+    & label {
+        @apply tw:pointer-events-none tw:absolute tw:inset-0 tw:block tw:rounded-full tw:ring-1! tw:ring-offset-1! tw:ring-transparent! tw:transition-all;
+    }
+
+    &:has(> input[type="radio"]:hover) label {
+        @apply tw:ring-card-brand/80!;
+    }
+
+    &:has(> input[type="radio"]:checked) label {
+        @apply tw:ring-card-brand!;
+    }
+
+    &:has(> input[type="radio"]:checked:hover) label {
+        @apply tw:ring-card-brand!;
+    }
+
+    &:has(> input[type="radio"]:focus-visible) label {
+        @apply tw:ring-card-brand! tw:outline tw:outline-2 tw:outline-offset-2 tw:outline-card-brand;
+    }
+}

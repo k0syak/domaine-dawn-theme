@@ -117,6 +117,10 @@
         },
         "sold_out_badge_color_scheme": {
           "label": "Sold out badge color scheme"
+        },
+        "sale_badge": {
+          "content": "Sale Badge",
+          "label": "Sale Badge - text"
         }
       }
     },
@@ -691,6 +695,24 @@
       },
       "presets": {
         "name": "Custom Liquid"
+      }
+    },
+    "custom-product-card": {
+      "name": "Custom - Product Card",
+      "settings": {
+        "header__product": {
+          "content": "Product"
+        },
+        "product": {
+          "label": "Product"
+        },
+        "show_add_to_cart": {
+          "label": "Add to cart button"
+        }
+      },
+      "presets": {
+        "name": "Custom - Product Card",
+        "category": "Custom"
       }
     },
     "featured-blog": {

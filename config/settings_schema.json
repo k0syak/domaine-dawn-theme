@@ -1263,6 +1263,16 @@
         "id": "sold_out_badge_color_scheme",
         "label": "t:settings_schema.badges.settings.sold_out_badge_color_scheme.label",
         "default": "scheme-3"
+      },
+      {
+        "type": "header",
+        "content": "t:settings_schema.badges.settings.sale_badge.content"
+      },
+      {
+        "type": "text",
+        "id": "product_card_sale_badge_text",
+        "label": "t:settings_schema.badges.settings.sale_badge.label",
+        "default": "On Sale!"
       }
     ]
   },

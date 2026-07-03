@@ -1,0 +1,289 @@
+{% comment %}
+  Renders a product card - custom
+
+  Accepts:
+  - card_product: {Object} Product Liquid object 
+  - show_add_to_cart: {Boolean} show add to cart button
+
+  Required script:
+  - assets/product-card--custom.js
+
+  Usage:
+  {% render 'card-product--custom', card_product: product,  %}
+{% endcomment %}
+
+{%- if card_product and card_product != blank -%}
+  {%- liquid
+    assign selected_variant = card_product.selected_or_first_available_variant
+    assign image_primary = selected_variant.featured_image | default: card_product.featured_image
+    assign image_secondary = selected_variant.metafields.custom.image_secondary
+    assign swatch_option_name = card_product.options.first
+  -%}
+
+  <product-card-custom
+    data-product-card
+    data-product-url="{{ card_product.url }}"
+    class="
+      tw:flex
+      tw:flex-col
+      tw:max-w-[344px]
+      tw:w-full
+      tw:py-[27px]
+      tw:px-[27px]
+    "
+  >
+
+    {%- comment -%} Image wrapper {%- endcomment -%}
+    <a
+      href="{{ selected_variant.url }}"
+      data-product-card="product-link"
+      class="tw:block"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div
+        class="
+          tw:relative
+          tw:overflow-hidden
+          tw:flex
+          tw:items-center
+          tw:justify-center
+          tw:w-full
+          tw:p-4
+          tw:aspect-square
+          tw:bg-white
+          tw:border
+          tw:border-gray-200
+          tw:rounded-2xl
+          tw:group
+        "
+      >
+
+        {%- if image_primary -%}
+          <img
+            data-product-card="image-primary"
+            src="{{ image_primary | image_url: width: 700 }}"
+            width="{{ image_primary.width }}"
+            height="{{ image_primary.height }}"
+            loading="lazy"
+            alt="{{ image_primary.alt | default: card_product.title | escape }}"
+            class="
+              tw:h-full
+              tw:w-full
+              tw:object-contain
+              tw:object-center
+              tw:transition-opacity
+              tw:duration-300
+              tw:ease-in-out
+              {% if image_secondary %}tw:group-hover:opacity-0{% endif %}
+            "
+          >
+        {%- else -%}
+          {{ 'product-apparel-1' | placeholder_svg_tag: 'tw:h-full tw:w-full tw:object-contain tw:object-center tw:text-gray-300' }}
+        {%- endif -%}
+
+        {%- comment -%} Image Secondary — for hover {%- endcomment -%}
+        {%- if image_secondary -%}
+          <img
+            data-product-card="image-secondary"
+            src="{{ image_secondary | image_url: width: 700 }}"
+            width="{{ image_secondary.width }}"
+            height="{{ image_secondary.height }}"
+            loading="lazy"
+            alt="{{ image_secondary.alt | default: card_product.title | escape }} - hover"
+            class="
+              tw:absolute
+              tw:inset-0
+              tw:p-4
+              tw:w-full
+              tw:h-full
+              tw:object-contain
+              tw:object-center
+              tw:transition-opacity
+              tw:duration-300
+              tw:ease-in-out
+              tw:opacity-0
+              tw:group-hover:opacity-100
+            "
+
+          >
+        {%- else -%}
+          {% comment %} Placeholder {% endcomment %}
+          <img
+            data-product-card="image-secondary"
+            src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+            width="700"
+            height="700"
+            loading="lazy"
+            alt="Placeholder"
+            class="
+              tw:absolute
+              tw:inset-0
+              tw:w-full
+              tw:h-full
+              tw:p-4
+              tw:object-contain
+              tw:object-center
+              tw:transition-opacity
+              tw:duration-300
+              tw:ease-in-out
+              tw:opacity-0
+              tw:group-hover:opacity-100
+            "
+          >
+        {%- endif -%}
+
+        {%- comment -%} Sale badge {%- endcomment -%}
+        <span
+          data-product-card="badge-sale"
+          class="tw:badge-sale{% unless selected_variant.compare_at_price > selected_variant.price %} tw:hidden{% endunless %}"
+        >
+          {{ settings.product_card_sale_badge_text }}
+        </span>
+      </div>
+    </a>
+
+    {%- comment -%} Info wrapper {%- endcomment -%}
+    <div class="tw:flex tw:flex-col tw:gap-6 tw:mt-6">
+
+      {%- comment -%} Variants Data {%- endcomment -%}
+      {%- capture product_variants_json -%}
+        [
+        {%- for variant in card_product.variants -%}
+          {%- liquid
+            assign current_image_primary = variant.featured_image | default: card_product.featured_image
+            assign current_image_secondary = variant.metafields.custom.image_secondary
+
+            assign on_sale = false
+            if variant.compare_at_price > variant.price
+              assign on_sale = true
+            endif
+          -%}
+          {
+          "variantId": {{ variant.id | json }},
+          "price": {
+          "regular": {{ variant.price | money | json }}{% if variant.compare_at_price > variant.price %},
+          "compareAt": {{ variant.compare_at_price | money | json }}{% endif %}
+          },
+          "images": {
+          "primary": {{ current_image_primary | image_url: width: 700 | json }}{% if current_image_secondary != blank %},
+          "secondary": {{ current_image_secondary | image_url: width: 700 | json }}{% endif %}
+          },
+          "isOnSale": {{ on_sale | json }}
+          }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+        ]
+      {%- endcapture -%}
+
+      <script type="application/json" data-product-card-variants="json">
+        {{ product_variants_json | strip }}
+      
+      </script>
+
+      {%- comment -%} Color Swatches - fieldset for accessibility {%- endcomment -%}
+      <fieldset class="tw:border-0 tw:p-0 tw:m-0 tw:min-w-0">
+        <legend class="tw:sr-only">
+          {%- if swatch_option_name != blank -%}
+            {{ swatch_option_name | escape }}
+          {%- else -%}
+            {{ 'products.product.product_variants' | t }}
+          {%- endif -%}
+        </legend>
+        <div class="tw:flex tw:items-center tw:gap-3.25">
+          {%- for variant in card_product.variants -%}
+            <div class="tw:swatch-radio">
+              <input
+                type="radio"
+                name="swatch-{{ card_product.id }}"
+                id="swatch-{{ card_product.id }}-{{ variant.id }}"
+                value="{{ variant.id }}"
+                data-product-card="variant-swatch"
+                aria-label="{{ 'products.product.variant_swatch_accessibility' | t: option_name: swatch_option_name, option_value: variant.option1 }}"
+                {% if selected_variant.id == variant.id %}
+                  checked
+                {% endif %}
+              >
+              <label
+                for="swatch-{{ card_product.id }}-{{ variant.id }}"
+                title="{{ variant.option1 | escape }}"
+                style="background-color: {{ variant.option1 | downcase | escape }};"
+              ></label>
+            </div>
+          {%- endfor -%}
+        </div>
+      </fieldset>
+
+      {%- comment -%} Product info {%- endcomment -%}
+      <div class="tw:flex tw:flex-col tw:gap-[6px]">
+        <span
+          class="tw:text-[14px] tw:leading-[16px] tw:!tracking-normal tw:text-card-body tw:font-normal tw:font-sans">
+          {{ card_product.vendor | escape }}
+        </span>
+
+        <h3
+          class="tw:!text-[16px] tw:!leading-[18px] tw:!tracking-normal tw:!text-card-brand tw:!font-medium tw:!font-sans">
+          <a
+            href="{{ selected_variant.url }}"
+            data-product-card="product-link"
+            class="tw:hover:underline tw:cursor-pointer"
+          >
+            {{ card_product.title | escape }}
+          </a>
+        </h3>
+
+        {%- comment -%} Price {%- endcomment -%}
+        <div
+          data-product-card="price-wrapper"
+          class="
+            tw:flex
+            tw:items-center
+            tw:gap-2
+            tw:text-[14px]
+            tw:leading-[16px]
+            tw:mt-0.5
+            tw:font-sans
+          "
+        >
+          <span
+            data-product-card="price-compare"
+            class="
+              tw:text-card-body
+              tw:line-through
+              tw:font-normal
+              {% unless selected_variant.compare_at_price > selected_variant.price %}tw:hidden{% endunless %}
+            "
+          >
+            {{ selected_variant.compare_at_price | money }}
+          </span>
+          {%- liquid
+            capture price_color
+              if selected_variant.compare_at_price > selected_variant.price
+                echo 'tw:text-card-sale'
+              else
+                echo 'tw:text-card-body'
+              endif
+            endcapture
+          -%}
+          <span
+            data-product-card="price-regular"
+            class="tw:font-normal {{ price_color }}"
+          >
+            {{ selected_variant.price | money }}
+          </span>
+        </div>
+
+        {%- comment -%} Show add to cart {%- endcomment -%}
+        {% if show_add_to_cart %}
+          <button
+            data-product-card="add-to-cart"
+            data-selected-variant-id="{{ selected_variant.id }}"
+            class="tw:add-to-cart-button"
+          >
+            {{ 'products.product.add_to_cart' | t }}
+          </button>
+        {% endif %}
+
+      </div>
+    </div>
+  </product-card-custom>
+{%- endif -%}
