@@ -82,7 +82,7 @@
       "name": "t:sections.custom-product-card.presets.name",
       "settings": {
         "product": "plain-t-shirt",
-        "show_add_to_cart": false,
+        "show_add_to_cart": true,
         "padding_top": 36,
         "padding_bottom": 36
       }
